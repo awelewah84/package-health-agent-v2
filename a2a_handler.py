@@ -6,6 +6,9 @@ from typing import List, Dict, Any
 from uuid import uuid4
 import json
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 class A2AHandler:
     """Handler for A2A protocol messages"""
@@ -61,6 +64,8 @@ class A2AHandler:
         
         # Extract user's text from message parts
         user_text = self._extract_text_from_message(user_message)
+        logger.info(f"Received message with {len(user_message.parts)} parts")
+        logger.info(f"Extracted text (first 200 chars): {user_text[:200]}")
         
         # Store in conversation history
         context_id = user_message.taskId or str(uuid4())
@@ -70,6 +75,7 @@ class A2AHandler:
         
         # Process the message and generate response
         response_text, artifacts = await self._process_user_message(user_text)
+        logger.info(f"Generated response (first 200 chars): {response_text[:200]}")
         
         # Create agent response message
         agent_message = A2AMessage(
@@ -195,9 +201,30 @@ class A2AHandler:
             return self._get_help_message(), []
     
     def _extract_text_from_message(self, message: A2AMessage) -> str:
-        """Extract text content from message parts"""
-        text_parts = [part.text for part in message.parts if part.kind == "text" and part.text]
-        return " ".join(text_parts)
+        """Extract text content and file data from message parts"""
+        content_parts = []
+        
+        for part in message.parts:
+            if part.kind == "text" and part.text:
+                content_parts.append(part.text)
+            elif part.kind == "file" and hasattr(part, 'data') and part.data:
+                # Handle file upload - decode base64 or direct text
+                try:
+                    import base64
+                    # Try to decode as base64
+                    file_content = base64.b64decode(part.data).decode('utf-8')
+                    content_parts.append(file_content)
+                except:
+                    # If not base64, treat as plain text
+                    content_parts.append(str(part.data))
+            elif part.kind == "data" and hasattr(part, 'data') and part.data:
+                # Handle data parts
+                if isinstance(part.data, str):
+                    content_parts.append(part.data)
+                elif isinstance(part.data, dict):
+                    content_parts.append(json.dumps(part.data))
+        
+        return " ".join(content_parts)
     
     def _extract_python_packages(self, text: str) -> List[str]:
         """Extract Python package specifications from text"""
