@@ -34,11 +34,16 @@ class A2AHandler:
             JSONRPCResponse object
         """
         try:
+            logger.info(f"A2A request - method: {request.method}, id: {request.id}")
+            if hasattr(request, 'params'):
+                logger.info(f"Request params type: {type(request.params)}")
+            
             if request.method == "message/send":
                 return await self._handle_message_send(request)
             elif request.method == "execute":
                 return await self._handle_execute(request)
             else:
+                logger.warning(f"Unknown method: {request.method}")
                 return self._error_response(
                     request.id,
                     -32601,
