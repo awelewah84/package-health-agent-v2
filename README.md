@@ -19,7 +19,7 @@ An **A2A (Agent-to-Agent) Protocol** AI Agent built with Python and FastAPI that
 1. **Clone the repository:**
 
 ```bash
-git clone https://github.com/awelewah84/package-health-agent-v2.git
+git clone https://github.com/MyITjournal/package-health-agent.git
 cd package-health-agent
 ```
 
@@ -626,8 +626,8 @@ MIT License
 
 ## Author
 
-**Ayo Awe**  
-GitHub: [awelewah84](https://github.com/awelewah84)
+**Adeyoola Adebayo**  
+GitHub: [@MyITjournal](https://github.com/MyITjournal)
 
 ## Acknowledgments
 

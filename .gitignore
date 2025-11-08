@@ -157,7 +157,3 @@ test-results/
 
 # Heroku
 .heroku/
-
-
-# Git folder
-.git/
